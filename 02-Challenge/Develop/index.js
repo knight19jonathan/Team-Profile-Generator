@@ -5,118 +5,128 @@ const Intern = require('./lib/Intern');
 const Engineer = require('./lib/Engineer');
 const Manager = require('./lib/Manager');
 const Employee = require('./lib/Employee');
+const { getSystemErrorName } = require('util');
 const team = [];
 
-async function startProgram() {
-    const managerForm = await managerQuestions()
-    const manager = new Manager(managerForm.managerName, managerForm.managerId, managerForm.managerEmail, managerForm.managerOfficeNumber)
-    team.push(manager)
-    startTeam()
 
-}
-async function managerQuestions() {
-    const managerFillin = await inquirer.prompt([
+async function startProgram() {
+    getName();
+
+async function getName() {
+    const newTeamMember = await inquirer.prompt([
         {
             type: 'input',
-            name: 'managerName',
-            message: 'What is the name of the manager of the team?'
-        },
-        {
-            type: 'input',
-            name: 'managerId',
-            message: 'What is the ID number of this manager?'
-        },
-        {
-            type: 'input',
-            name: 'managerEmail',
-            message: 'What is the email of this manager?'
-        },
-        {
-            type: 'input',
-            name: 'managerOfficeNumber',
-            message: 'What is the office number of this manager?'
+            name: 'name',
+            message: 'What is the name of the team member?'
         }
     ])
-    return managerFillin;
+    getId();
+    return this.name;
 }
-async function startTeam() {
-    const teamFillin = await teamClassPick();
-    console.log(teamFillin)
-    if(teamFillin === 'Intern') {
-        const internFillin = await internQuestions();
-        const intern = new Intern(internFillin.internName, internFillin.internId, internFillin.internEmail, internFillin.internSchool);
-        team.push(intern);
-    } else if (teamFillin === 'Engineer') {
-        const engineerFillin = await engineerQuestions();
-        const engineer = new Engineer(engineerFillin.engineerName, engineerFillin.engineerId, engineerFillin.engineerEmail, engineerFillin.engineerGithub);
-        team.push(engineer);
-    } else {
-        console.log("Exit!");
-        return;
-    }
-    outputHtml()
+async function getId() {
+    const newId = await inquirer.prompt([
+        {
+            type: 'number',
+            name: 'id',
+            message: 'What is the ID number of this employee?'
+        }
+    ])
+    getEmail();
+    return this.id;
 }
-async function teamClassPick() {
-    const teamClass = await inquirer.prompt([
+async function getEmail() {
+    const newEmail = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'email',
+            message: 'What is the email of this employee?'
+        }
+    ])
+    getRole();
+    return this.email;
+}
+async function getRole() {
+    const role = await inquirer.prompt([
         {
             type: 'list',
             name: 'teamOperatorClass',
             message: 'What type of team member would you like to add?',
-            choices: ['Intern', 'Engineer', 'Quit']
+            choices: ['Intern', 'Engineer', 'Manager']
+        }
+        
+    ]).then(ans => {
+        // console.log(role.teamOperatorClass);
+        switch (ans.teamOperatorClass) {
+            case 'Intern':
+                console.log("fuck");
+                getSchool();
+                const intern = new Intern(this.name, this.id, this.email, this.school);
+                team.push(intern)
+                console.log("fucks");
+                break;
+            case 'Engineer':
+                getGithub();
+                const engineer = new Engineer(this.name, this.id, this.email, this.github);
+                team.push(engineer)
+
+                break;
+            case 'Manager':
+                getOfficeNumber();
+                const manager = new Manager(this.name, this.id, this.email, this.officeNumber);
+                team.push(manager)
+                break;
+        }
+        
+    })
+    // outputHtml();
+    
+    
+}
+}
+function getSchool() {
+    console.log("ass")
+    const newSchool = inquirer.prompt(
+        {
+            type: 'input',
+            name: 'school',
+            message: 'What school does this intern attend?'
+        }).then(({ school }) => {
+            console.log(school);
+            const intern = new Intern(this.name, this.id, this.email, school);
+            team.push(intern);
+            console.log(team);
+            outputHtml();
+        })
+
+        };
+    
+ 
+
+function getGithub() {
+    const newGithub = inquirer.prompt([
+        {
+            type: 'input',
+            name: 'github',
+            message: 'What is the GitHub username of this engineer?'
         }
     ])
-    return teamClass.teamOperatorClass;
+    
+    return this.github;
+    
 }
-async function internQuestions() {
-    const internFillin = await inquirer.prompt([
+function getOfficeNumber() {
+    const newOfficeNumber = inquirer.prompt([
         {
             type: 'input',
-            name: 'internName',
-            message: 'What is the name of the intern?'
-        },
-        {
-            type: 'number',
-            name: 'internId',
-            message: 'What is the ID number of this intern?'
-        },
-        {
-            type: 'input',
-            name: 'internEmail',
-            message: 'What is the email of this intern?'
-        },
-        {
-            type: 'input',
-            name: 'internSchool',
-            message: 'What school is this intern attending?'
+            name: 'officeNumber',
+            message: 'What is the office number of this manager?'
         }
     ])
-    return internFillin;
+    
+    return this.officeNumber;
+    
 }
-async function engineerQuestions() {
-    const engineerFillin = await inquirer.prompt([
-        {
-            type: 'input',
-            name: 'engineerName',
-            message: 'What is the name of the engineer?'
-        },
-        {
-            type: 'number',
-            name: 'engineerId',
-            message: 'What is the ID number of this engineer?'
-        },
-        {
-            type: 'input',
-            name: 'engineerEmail',
-            message: 'What is the email of this engineer?'
-        },
-        {
-            type: 'input',
-            name: 'engineerGithub',
-            message: 'What is the github username of this engineer?'
-        }
-    ])
-    return engineerFillin;
-}
+
 async function outputHtml() {
     const newHtml = await inquirer.prompt([
         {
@@ -125,7 +135,7 @@ async function outputHtml() {
             message: 'Complete filling out team members or create HTML team portfolio?',
             choices: ['Complete Team', 'Create More Team Members']
         }])
-    if(newHtml.htmlOutput === 'Create More Team Members') {
+    if (newHtml.htmlOutput === 'Create More Team Members') {
         teamClassPick();
     } else {
         const html = generateHTML(team);
