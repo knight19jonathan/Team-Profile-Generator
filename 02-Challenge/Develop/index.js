@@ -5,24 +5,31 @@ const Intern = require('./lib/Intern');
 const Engineer = require('./lib/Engineer');
 const Manager = require('./lib/Manager');
 const Employee = require('./lib/Employee');
-const { getSystemErrorName } = require('util');
+
 const team = [];
 
 
+//starts program 
 async function startProgram() {
     getName();
 
+//gets a name 
 async function getName() {
-    const newTeamMember = await inquirer.prompt([
+    const employeeName = await inquirer.prompt([
         {
             type: 'input',
             name: 'name',
             message: 'What is the name of the team member?'
         }
-    ])
-    getId();
-    return this.name;
+    ]).then(({ name }) => {
+        console.log(name);
+        const employee = new Employee(name);
+        console.log(employee);
+        getId();
+    })
+    
 }
+// gets an id still in progrress
 async function getId() {
     const newId = await inquirer.prompt([
         {
@@ -30,10 +37,16 @@ async function getId() {
             name: 'id',
             message: 'What is the ID number of this employee?'
         }
-    ])
-    getEmail();
-    return this.id;
+    ]).then(({ id }) => {
+        console.log(id);
+        const employee = new Employee(id);   
+        console.log(employee);
+        getEmail();
+    })
+
 }
+
+// gets an email still in progrress
 async function getEmail() {
     const newEmail = await inquirer.prompt([
         {
@@ -41,28 +54,33 @@ async function getEmail() {
             name: 'email',
             message: 'What is the email of this employee?'
         }
-    ])
-    getRole();
-    return this.email;
+    ]).then(({ email }) => {
+        console.log(email);
+        const employee = new Employee(email);
+        console.log(employee);
+        getRole();
+    })
 }
+
+//gets a role still in progrress
 async function getRole() {
     const role = await inquirer.prompt([
         {
             type: 'list',
-            name: 'teamOperatorClass',
+            name: 'role',
             message: 'What type of team member would you like to add?',
             choices: ['Intern', 'Engineer', 'Manager']
         }
         
     ]).then(ans => {
-        // console.log(role.teamOperatorClass);
-        switch (ans.teamOperatorClass) {
+        console.log(ans.role);
+        const employee = new Employee(ans.role);
+        console.log(employee);
+        switch (ans.role) {
             case 'Intern':
-                console.log("fuck");
                 getSchool();
-                const intern = new Intern(this.name, this.id, this.email, this.school);
+                const intern = new Employee(this.name, this.id, this.email, this.school);
                 team.push(intern)
-                console.log("fucks");
                 break;
             case 'Engineer':
                 getGithub();
@@ -83,8 +101,8 @@ async function getRole() {
     
 }
 }
+// gets role specific question 
 function getSchool() {
-    console.log("ass")
     const newSchool = inquirer.prompt(
         {
             type: 'input',
@@ -126,7 +144,7 @@ function getOfficeNumber() {
     return this.officeNumber;
     
 }
-
+// outputs to html works but doesnt hold name, id, and email doesnt include correct css
 async function outputHtml() {
     const newHtml = await inquirer.prompt([
         {
@@ -146,6 +164,7 @@ async function outputHtml() {
         });
     }
 }
+// inits the program on run of node index.js 
 
 startProgram();
 
